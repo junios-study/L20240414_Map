@@ -4,8 +4,9 @@
 
 using namespace std;
 
-struct CharacterInfo
+class AActor
 {
+public:
 	int X;
 	int Y;
 	char Shape;
@@ -15,11 +16,14 @@ struct CharacterInfo
 //전역변수
 int MapHeight = 10;
 int KeyCode = 0;
-CharacterInfo* Player = nullptr;
-CharacterInfo* Monster = nullptr;
+AActor* Player = nullptr;
+AActor* Monster = nullptr;
+AActor* Goal = nullptr;
 
 string* Map;
 bool IsRunning = true;
+
+
 
 
 
@@ -55,6 +59,7 @@ void Initialize()
 {
 	//Load
 	Map = new string[MapHeight];
+
 	//FILE
 	Map[0] = "***************";
 	Map[1] = "*             *";
@@ -64,18 +69,23 @@ void Initialize()
 	Map[5] = "*             *";
 	Map[6] = "*             *";
 	Map[7] = "*   *         *";
-	Map[8] = "*   *        G*";
+	Map[8] = "*   *         *";
 	Map[9] = "***************";
 
-	Player = new CharacterInfo();
+	Player = new AActor();
 	Player->X = 1;
 	Player->Y = 1;
 	Player->Shape = 'P';
 
-	Monster = new CharacterInfo();
+	Monster = new AActor();
 	Monster->X = 8;
 	Monster->Y = 8;
 	Monster->Shape = 'M';
+
+	Goal = new AActor();
+	Goal->X = 5;
+	Goal->Y = 5;
+	Goal->Shape = 'G';
 
 	srand((unsigned int)(time(nullptr)));
 
@@ -142,6 +152,13 @@ void Tick()
 			Monster->X++;
 		}
 	}
+
+
+	//GameMode
+	if (Player->X == Goal->X && Player->Y == Goal->Y)
+	{
+		IsRunning = false;
+	}
 }
 
 void Render()
@@ -164,6 +181,9 @@ void Render()
 
 	GotoXY(Monster->X, Monster->Y);
 	cout << Monster->Shape;
+
+	GotoXY(Goal->X, Goal->Y);
+	cout << Goal->Shape;
 }
 
 void GotoXY(int X, int Y)
@@ -182,12 +202,17 @@ void Terminate()
 	delete Monster;
 	Monster = nullptr;
 
+	delete Goal;
+	Goal = nullptr;
+
 	delete[] Map;
 	Map = nullptr;
 }
 
 bool Predict(int PredictX, int PredictY)
 {
+
+	//충돌체크, 즐거운 수학
 	if (Map[PredictY][PredictX] == ' ')
 	{
 		return true;
