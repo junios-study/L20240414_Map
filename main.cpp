@@ -29,6 +29,8 @@ void Tick();
 void Render();
 void GotoXY(int x, int y);
 void Terminate();
+bool Predict(int PredictX, int PredictY);
+
 
 
 
@@ -71,8 +73,8 @@ void Initialize()
 	Player->Shape = 'P';
 
 	Monster = new CharacterInfo();
-	Monster->X = 9;
-	Monster->Y = 9;
+	Monster->X = 8;
+	Monster->Y = 8;
 	Monster->Shape = 'M';
 
 	srand((unsigned int)(time(nullptr)));
@@ -87,19 +89,19 @@ void Input()
 void Tick()
 {
 	//Player
-	if (KeyCode == 'w')
+	if (KeyCode == 'w' && Predict(Player->X, Player->Y - 1))
 	{
 		Player->Y--;
 	}
-	if (KeyCode == 's')
+	if (KeyCode == 's' && Predict(Player->X, Player->Y + 1))
 	{
 		Player->Y++;
 	}
-	if (KeyCode == 'a')
+	if (KeyCode == 'a' && Predict(Player->X - 1, Player->Y))
 	{
 		Player->X--;
 	}
-	if (KeyCode == 'd')
+	if (KeyCode == 'd' && Predict(Player->X + 1, Player->Y))
 	{
 		Player->X++;
 	}
@@ -114,19 +116,31 @@ void Tick()
 	int Direction = rand() % 4;
 	if (Direction == 0)
 	{
-		Monster->Y--;
+		if (Predict(Monster->X, Monster->Y - 1))
+		{
+			Monster->Y--;
+		}
 	}
 	if (Direction == 1)
 	{
-		Monster->Y++;
+		if (Predict(Monster->X, Monster->Y + 1))
+		{
+			Monster->Y++;
+		}
 	}
 	if (Direction == 2)
 	{
-		Monster->X--;
+		if (Predict(Monster->X - 1, Monster->Y))
+		{
+			Monster->X--;
+		}
 	}
 	if (Direction == 3)
 	{
-		Monster->X++;
+		if (Predict(Monster->X + 1, Monster->Y))
+		{
+			Monster->X++;
+		}
 	}
 }
 
@@ -170,4 +184,14 @@ void Terminate()
 
 	delete[] Map;
 	Map = nullptr;
+}
+
+bool Predict(int PredictX, int PredictY)
+{
+	if (Map[PredictY][PredictX] == ' ')
+	{
+		return true;
+	}
+
+	return false;
 }
